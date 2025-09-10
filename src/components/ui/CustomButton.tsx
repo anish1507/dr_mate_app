@@ -9,6 +9,9 @@ import {
   ViewStyle,
   TextStyle,
   TouchableOpacityProps,
+  Image,
+  ImageSourcePropType,
+  ImageStyle,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Colors, Fonts } from '@utils/Constants';
@@ -23,6 +26,9 @@ interface CustomButtonProps extends TouchableOpacityProps {
   loading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  leftImage?: ImageSourcePropType;
+  rightImage?: ImageSourcePropType;
+  imageStyle?: StyleProp<ImageStyle>;
   fullWidth?: boolean;
   borderRadius?: number;
   containerStyle?: StyleProp<ViewStyle>;
@@ -36,8 +42,11 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   loading = false,
   leftIcon,
   rightIcon,
+  leftImage,
+  rightImage,
+  imageStyle,
   fullWidth = true,
-  borderRadius = RFValue(5), // Default borderRadius
+  borderRadius = RFValue(5),
   containerStyle,
   textStyle,
   disabled,
@@ -97,6 +106,25 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     }
   };
 
+  // Render icon or image
+  const renderIcon = (icon: React.ReactNode | undefined, image: ImageSourcePropType | undefined, position: 'left' | 'right') => {
+    if (icon) {
+      return <View style={[styles.icon, position === 'right' && styles.rightIcon]}>{icon}</View>;
+    }
+    
+    if (image) {
+      return (
+        <Image 
+          source={image} 
+          style={[styles.image, imageStyle, position === 'right' && styles.rightIcon]} 
+          resizeMode="contain"
+        />
+      );
+    }
+    
+    return null;
+  };
+
   return (
     <TouchableOpacity
       style={[getButtonStyle(), getSizeStyle(), containerStyle]}
@@ -110,9 +138,9 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         />
       ) : (
         <View style={styles.content}>
-          {leftIcon && <View style={styles.icon}>{leftIcon}</View>}
+          {renderIcon(leftIcon, leftImage, 'left')}
           <Text style={[getTextStyle(), textStyle]}>{title}</Text>
-          {rightIcon && <View style={styles.icon}>{rightIcon}</View>}
+          {renderIcon(rightIcon, rightImage, 'right')}
         </View>
       )}
     </TouchableOpacity>
@@ -185,7 +213,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   icon: {
-    marginHorizontal: RFValue(5),
+    marginRight: RFValue(8),
+  },
+  rightIcon: {
+    marginRight: 0,
+    marginLeft: RFValue(8),
+  },
+  image: {
+    width: RFValue(20),
+    height: RFValue(20),
+    marginRight: RFValue(8),
   },
 });
 

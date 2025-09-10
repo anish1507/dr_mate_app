@@ -65,6 +65,10 @@ const Login: FC = () => {
     }, 1500);
   };
 
+  const handlePressSingup=()=>{
+    resetAndNavigate('Signup');
+  }
+
   return (
     <GestureHandlerRootView style={styles.container}>
       <View style={styles.container}>
@@ -113,11 +117,6 @@ const Login: FC = () => {
                      borderRadius={50} 
                   />
                   
-                  {/* <View style={styles.divider}>
-                    <View style={styles.dividerLine} />
-                    <CustomText style={styles.dividerText}>or</CustomText>
-                    <View style={styles.dividerLine} />
-                  </View> */}
                   
                  <CustomButton
                     title="Continue with Google Account"
@@ -125,15 +124,16 @@ const Login: FC = () => {
                     variant="outline"
                     size="medium"
                     fullWidth
+                    leftImage={require('@assets/images/Google.png')}
                     borderRadius={50} // Slightly rounded corners for Google style
-                    leftIcon={<Ionicons name="logo-google" size={18} color="#DB4437" />} // Google brand color
+                    // leftIcon={<Ionicons name="logo-google" size={16} color="#DB4437" />} // Google brand color
                     containerStyle={styles.googleButton} // Additional styling
                     textStyle={styles.googleButtonText} // Text styling
                   />
                   
                   <View style={styles.signupContainer}>
                     <CustomText style={styles.signupText}>Don't have an account? </CustomText>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={handlePressSingup}>
                       <CustomText style={styles.signupLink}>Create Account</CustomText>
                     </TouchableOpacity>
                   </View>
