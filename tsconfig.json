@@ -1,0 +1,21 @@
+{
+   
+  "extends": "@react-native/typescript-config/tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "typeRoots": ["node_modules/@types","src/types"],
+    "types": ["jest"],
+    "baseUrl": "./src/",
+    "paths": {
+      "@assets/*":["assets/*"],
+      "@features/*":["features/*"],
+      "@screens/*": ["screens/*"],
+      "@service/*":["service/*"],
+      "@styles/*":["styles/*"],
+      "@navigation/*":["navigation/*"],
+      "@components/*":["components/*"],
+      "@state/*":["state/*"],
+      "@utils/*":["utils/*"]
+    }
+  }
+}
