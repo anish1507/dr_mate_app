@@ -1,6 +1,7 @@
 {
    
   "extends": "@react-native/typescript-config/tsconfig.json",
+  "include": ["src", "declarations.d.ts"],
   "compilerOptions": {
     "skipLibCheck": true,
     "typeRoots": ["node_modules/@types","src/types"],

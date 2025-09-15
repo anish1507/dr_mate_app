@@ -1,4 +1,4 @@
-import { View, StyleSheet, SafeAreaView, Animated, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, SafeAreaView, Animated, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
@@ -11,6 +11,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import CustomInput from '@components/ui/CustomInput';
 import CustomButton from '@components/ui/CustomButton';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import axios from 'axios';
+import { BASE_URL, endPoint, setLocalStorage, X_API_KEY } from '@utils/factory';
 
 const bottomColors = [...lightColors].reverse();
 
@@ -23,48 +25,116 @@ const SignUp: FC = () => {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const keyboardOffsetHeight = useKeyboardOffsetHeight();
 
-  useEffect(() => {
-    if (keyboardOffsetHeight == 0) {
-      Animated.timing(animatedValue, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true
-      }).start();
-    } else {
-      Animated.timing(animatedValue, {
-        toValue: -keyboardOffsetHeight * 0.84,
-        duration: 500,
-        useNativeDriver: true
-      }).start();
-    }
-  }, [keyboardOffsetHeight]);
+  // useEffect(() => {
+  //   if (keyboardOffsetHeight == 0) {
+  //     Animated.timing(animatedValue, {
+  //       toValue: 0,
+  //       duration: 500,
+  //       useNativeDriver: true
+  //     }).start();
+  //   } else {
+  //     Animated.timing(animatedValue, {
+  //       toValue: -keyboardOffsetHeight * 0.84,
+  //       duration: 500,
+  //       useNativeDriver: true
+  //     }).start();
+  //   }
+  // }, [keyboardOffsetHeight]);
 
-  const handleGesture = ({ nativeEvent }: any) => {
-    if (nativeEvent.state === State.END) {
-      const { translationX, translationY } = nativeEvent;
-      let direction = '';
-      if (Math.abs(translationX) > Math.abs(translationY)) {
-        direction = translationX > 0 ? 'right' : 'left';
-      } else {
-        direction = translationY > 0 ? 'down' : 'up';
-      }
-      const newSequence = [...gestureSequence, direction].slice(-5);
-      setGestureSequence(newSequence);
-      if (newSequence.join(' ') === 'up up down left right') {
-        setGestureSequence([]);
-        resetAndNavigate('Login');
-      }
-    }
-  };
+  // const handleGesture = ({ nativeEvent }: any) => {
+  //   if (nativeEvent.state === State.END) {
+  //     const { translationX, translationY } = nativeEvent;
+  //     let direction = '';
+  //     if (Math.abs(translationX) > Math.abs(translationY)) {
+  //       direction = translationX > 0 ? 'right' : 'left';
+  //     } else {
+  //       direction = translationY > 0 ? 'down' : 'up';
+  //     }
+  //     const newSequence = [...gestureSequence, direction].slice(-5);
+  //     setGestureSequence(newSequence);
+  //     if (newSequence.join(' ') === 'up up down left right') {
+  //       setGestureSequence([]);
+  //       resetAndNavigate('Login');
+  //     }
+  //   }
+  // };
 
-  const handleSignUp = () => {
+  // const handleSignUp = () => {
+  //   setLoading(true);
+  //   // Simulate sign-up process
+  //   setTimeout(() => {
+  //     setLoading(false);
+  //     resetAndNavigate('Home');
+  //   }, 1500);
+  // };
+
+    const validateEmail = (email: string) => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+};
+
+const handleSignUp = async () => {
+  // ================= Validation ==================
+  // if (!fullName.trim()) {
+  //   Alert.alert("Validation Error", "Full Name is required.");
+  //   return;
+  // }
+
+  if (!email.trim()) {
+    Alert.alert("Validation Error", "Email is required.");
+    return;
+  }
+  if (!validateEmail(email)) {
+    Alert.alert("Validation Error", "Please enter a valid email address.");
+    return;
+  }
+  if (!password.trim()) {
+    Alert.alert("Validation Error", "Password is required.");
+    return;
+  }
+  if (password.length < 6) {
+    Alert.alert("Validation Error", "Password must be at least 6 characters long.");
+    return;
+  }
+
+  try {
     setLoading(true);
-    // Simulate sign-up process
-    setTimeout(() => {
-      setLoading(false);
-      resetAndNavigate('Home');
-    }, 1500);
-  };
+
+    const response = await axios.post(
+      `${BASE_URL}${endPoint.signup}`,
+      { email, password },
+      {
+        headers: {
+          "x-api-key": X_API_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("ddddwedwefw",response.data)
+    if (response.data) {
+      // Navigate to main app
+       Alert.alert(
+        "Signup Successful",
+        "User created successfully!",
+        [
+          {
+            text: "OK",
+            onPress: () => resetAndNavigate("Login"), // go to login page
+          },
+        ],
+        { cancelable: false }
+      );
+    } else {
+      Alert.alert("Signup Failed", "Signup failed");
+    }
+  } catch (error: any) {
+    console.error("Signup error:", error);
+    Alert.alert("Error",  "Something went wrong!");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleBack = () => {
     // Navigate back to previous screen
@@ -75,17 +145,11 @@ const SignUp: FC = () => {
     <GestureHandlerRootView style={styles.container}>
       <View style={styles.container}>
         <CustomSafeAreaView>
-          <PanGestureHandler onHandlerStateChange={handleGesture}>
-            <Animated.ScrollView
-              bounces={false}
-              keyboardDismissMode={'on-drag'}
-              keyboardShouldPersistTaps="handled"
-              contentContainerStyle={styles.subContainer}
-            >
+          
+              <View style={styles.subContainer}>
               {/* <LinearGradient colors={bottomColors} style={styles.gradient} /> */}
               <View style={styles.content}>
-                {/* <Image source={require('@assets/images/logo1.png')} style={styles.logo} />
-                 */}
+                
                  <View style={styles.titleContainer}>
                   <TouchableOpacity style={styles.backButton} onPress={handleBack}>
                     <Ionicons name="chevron-back" size={RFValue(20)} color={Colors.white} />
@@ -103,6 +167,7 @@ const SignUp: FC = () => {
                     placeholder="Name"
                     value={fullName}
                     onChangeText={setFullName}
+                    textColor={Colors.white}
                     autoCapitalize="words"
                     left={<Ionicons name="person-outline" size={20} color="#ccc" />}
                   />
@@ -110,10 +175,11 @@ const SignUp: FC = () => {
                   {/* Email Section */}
                   <CustomText style={styles.sectionTitle}>Email</CustomText>
                   <CustomInput
-                    placeholder="youremailaddress@gmail.com"
+                    placeholder="Enter the email"
                     value={email}
                     onChangeText={setEmail}
                     keyboardType="email-address"
+                    textColor={Colors.white}
                     autoCapitalize="none"
                     left={<Ionicons name="mail-outline" size={20} color="#ccc" />}
                   />
@@ -124,6 +190,7 @@ const SignUp: FC = () => {
                     placeholder="Enter Your Password"
                     value={password}
                     onChangeText={setPassword}
+                    textColor={Colors.white}
                     secureTextEntry
                     left={<Ionicons name="lock-closed-outline" size={20} color="#ccc" />}
                   />
@@ -151,8 +218,8 @@ const SignUp: FC = () => {
                   </View>
                 </View>
               </View>
-            </Animated.ScrollView>
-          </PanGestureHandler>
+              </View>
+            
         </CustomSafeAreaView>
       </View>
     </GestureHandlerRootView>
