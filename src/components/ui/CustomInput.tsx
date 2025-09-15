@@ -5,19 +5,27 @@ import { Colors, Fonts } from '@utils/Constants';
 
 interface InputProps {
   left?: React.ReactNode;
+  backgroundColor?: string;   // custom background color
+  outlineColor?: string;      // custom outline/border color
+  textColor?: string;         // custom text color
+  placeholderColor?: string;  // custom placeholder text color
 }
 
 const CustomInput: FC<InputProps & React.ComponentProps<typeof TextInput>> = ({
   left,
+  backgroundColor = Colors.primary_dark,
+  outlineColor = Colors.primary_light,
+  textColor = Colors.text,
+  placeholderColor = "#ccc",
   ...props
 }) => {
   return (
-    <View style={styles.flexRow}>
+    <View style={[styles.flexRow, { backgroundColor, borderColor: outlineColor }]}>
       {left && <View style={styles.iconContainer}>{left}</View>}
       <TextInput
         {...props}
-        style={styles.inputContainer}
-        placeholderTextColor="#ccc"
+        style={[styles.inputContainer, { color: textColor }]} // ✅ text color applied
+        placeholderTextColor={placeholderColor}              // ✅ placeholder color applied
       />
     </View>
   );
@@ -25,25 +33,22 @@ const CustomInput: FC<InputProps & React.ComponentProps<typeof TextInput>> = ({
 
 const styles = StyleSheet.create({
   inputContainer: {
-    flex: 1, // fill remaining space
+    flex: 1,
     fontFamily: Fonts.SemiBold,
     fontSize: RFValue(12),
     paddingVertical: 14,
-    color: Colors.text,
   },
   flexRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 0.5,
+    borderWidth: 0.5,   // outline thickness
     borderRadius: 5,
     width: '100%',
     marginVertical: 10,
-    backgroundColor: Colors.primary_dark,
-    borderColor: Colors.primary_light,
     paddingHorizontal: 10,
   },
   iconContainer: {
-    marginRight: 10, // spacing between icon and text
+    marginRight: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -6,6 +6,8 @@ import { navigationRef } from '@utils/NavigationUtils';
 import SplashScreen from '@screens/SplashScreen';
 import Login from '@screens/Login';
 import Singnup from '@screens/Signup';
+import BottomTabs from './BottomTab';
+// import BottomTabs from "@components/BottomTabs";
 
 
 const Stack = createNativeStackNavigator();
@@ -28,6 +30,8 @@ const Navigation: FC = () => {
           component={Singnup}
           options={{ animation: 'fade' }}
         />
+            {/* After login, go to bottom tabs */}
+        <Stack.Screen name="MainApp" component={BottomTabs} />
       </Stack.Navigator>
     </NavigationContainer>
   );
